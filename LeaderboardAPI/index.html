@@ -1,0 +1,63 @@
+<html>
+<link rel='stylesheet' type='text/css' href='wbp.css' />
+<script type="text/javascript">
+
+   var gameId = 3449;
+   var itemId = 11141;
+   var numRows = 10;
+   var time = 1;
+   var gameName = "BIG BROTHER";
+   var highScores = "CITIZENS";
+
+   function pageLoad(){
+      //alert("Hello, World!");
+      
+      var xmlhttp;
+      xmlhttp=new XMLHttpRequest();
+      xmlhttp.open("GET","http://dev.arisgames.org/server/json.php/v1.games.getLeaderboard/"+ gameId + "/" + numRows + "/" + itemId + "/" + time,false);
+      xmlhttp.send(null); //Synchronous call
+
+      var response=JSON.parse(xmlhttp.responseText);
+      //alert(xmlhttp.responseText);
+      //var playerData = response.data[0].rows[0];
+      var players = response.data;
+      if(response.returnCode != 0) //Error
+      {
+	 document.getElementById('serverMessage').innerHTML = response.data;	
+      }
+      else
+      {
+	 document.getElementById('serverMessage').innerHTML = "Success!-<br />"+JSON.stringify(response.data);	
+	 formatPage(players);
+      }
+   }
+
+
+   function formatPage(players)
+   {
+       htmlcontent = "<div class='page'>\n";
+
+       htmlcontent += "<div class='center' id='leaderboardTitle'>" + gameName + "</div></br></br>";
+       htmlcontent += "<div class='center' id='highScores'><u>" + highScores + "</u></div></br></br>";
+       htmlcontent += "<div class='center' id='refresh'><a onclick='pageLoad()' href='#'>(refresh?)</a></div></br>";
+       htmlcontent += "<div style='height:10px;'></div>\n";
+
+       htmlcontent += "<div class='center'>";
+       htmlcontent += "<table class='centerTable'>";
+       for(var i = 0; i < players.length; i++){
+           var playerName = players[i].rows[0][6];
+           var score = players[i].rows[0][17];
+           htmlcontent += "<tr class='highScoreTable'><td>" + score + "</td><td>" + playerName + "</td></tr></br>";
+       }
+       htmlcontent += "</table>";
+       htmlcontent += "</div></div>";
+       document.getElementById("serverMessage").innerHTML = htmlcontent;
+    }
+
+
+</script>
+<body onload='pageLoad()' id='body'>
+<div id='serverMessage'> Waiting on Server... </div>
+</body>
+</html>
+
